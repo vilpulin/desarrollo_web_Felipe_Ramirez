@@ -1,0 +1,229 @@
+/* ============================================================
+   estilos.css — Sistema de Avistamientos de Aves de Chile
+   Estética plana, tipo terminal: fondo ámbar sólido, texto blanco
+   monoespaciado, sin sombras ni bordes redondeados.
+   Paleta (tomada de una página de referencia tipo terminal):
+     --fondo    #AD6400  (ámbar/marrón, color base de toda la página)
+     --texto    #FFFFFF  (blanco)
+     --panel    #984E00  (paneles/inputs, un tono más oscuro que el fondo)
+     --err-bg   #1A1000  (fondo del aviso de error)
+     --err-fg   #FFD941  (texto del aviso de error)
+   Franja decorativa con los mismos colores que la página de referencia.
+   ============================================================ */
+
+:root {
+  --fondo: #AD6400;
+  --panel: #984E00;
+  --texto: #FFFFFF;
+  --linea: #FFFFFF;
+  --err-bg: #1A1000;
+  --err-fg: #FFD941;
+  --franja-1: #00b7ff;
+  --franja-2: #FFA52C;
+  --franja-3: #FFFF41;
+  --franja-4: #329c46;
+  --franja-5: #0000F9;
+  --franja-6: #86007D;
+  --fuente: "GoMono Nerd Font", "Go Mono", ui-monospace, "SFMono-Regular",
+    Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--fuente);
+  color: var(--texto);
+  background-color: var(--fondo);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ---------- Franja decorativa ---------- */
+.franja { display: flex; height: 6px; }
+.franja span { flex: 1; }
+.franja span:nth-child(1) { background: var(--franja-1); }
+.franja span:nth-child(2) { background: var(--franja-2); }
+.franja span:nth-child(3) { background: var(--franja-3); }
+.franja span:nth-child(4) { background: var(--franja-4); }
+.franja span:nth-child(5) { background: var(--franja-5); }
+.franja span:nth-child(6) { background: var(--franja-6); }
+
+/* ---------- Encabezado / navegación ---------- */
+.encabezado__contenido {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem 1.4rem 0.6rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.marca { text-decoration: none; color: var(--texto); }
+.marca__texto { font-size: 1.3rem; font-weight: 700; }
+.marca__texto small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--texto);
+  opacity: 0.8;
+}
+
+.nav-principal ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  flex-wrap: wrap;
+  font-size: 0.92rem;
+}
+
+.nav-principal a { color: var(--texto); text-decoration: underline; font-weight: 700; }
+.nav-principal a:hover, .nav-principal a:focus-visible { color: var(--err-fg); }
+.nav-principal a[aria-current="page"] { text-decoration: none; border-bottom: 2px solid var(--texto); }
+
+/* ---------- Layout general ---------- */
+main { max-width: 60rem; margin: 0 auto; padding: 1.6rem 1.4rem 4rem; }
+
+.pie-pagina {
+  border-top: 1px solid var(--linea);
+  text-align: center;
+  padding: 1.2rem 1rem 2rem;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  max-width: 60rem;
+  margin: 0 auto;
+}
+
+h1, h2, h3 { font-weight: 700; line-height: 1.25; margin: 1.6rem 0 0.7rem; }
+h1 { font-size: 1.6rem; margin-top: 0; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.05rem; }
+
+p { max-width: 74ch; }
+
+a { color: var(--texto); font-weight: 700; text-decoration: underline; }
+a:hover, a:focus-visible { color: var(--err-fg); }
+
+.parrafo-intro { max-width: 72ch; }
+
+/* ---------- Tarjetas de navegación (portada) ---------- */
+.mapa-secciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.tarjeta-seccion { display: block; text-decoration: none; color: var(--texto); border: 1px solid var(--linea); padding: 1rem 1.1rem 1.2rem; }
+.tarjeta-seccion:hover, .tarjeta-seccion:focus-visible { background: var(--panel); }
+.tarjeta-seccion .numero-punto { font-size: 0.8rem; opacity: 0.8; }
+.tarjeta-seccion h3 { margin: 0.2rem 0 0.4rem; text-decoration: underline; }
+.tarjeta-seccion p { margin: 0; font-size: 0.9rem; }
+
+/* ---------- Formularios ---------- */
+.formulario { border: 1px solid var(--linea); padding: 1.4rem 1.4rem 1.8rem; max-width: 44rem; }
+
+fieldset { border: none; border-top: 1px dashed var(--linea); padding: 1rem 0 0; margin: 0 0 1.2rem; }
+fieldset legend { font-weight: 700; padding-right: 0.6rem; }
+
+.campo { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.campo label { font-weight: 700; font-size: 0.92rem; }
+.campo .ayuda { font-size: 0.8rem; opacity: 0.85; }
+
+.opcional::after { content: " (opcional)"; font-weight: 400; opacity: 0.75; font-size: 0.8rem; }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+input[type="time"], input[type="number"], input[type="file"], select, textarea {
+  font: inherit;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--linea);
+  background: var(--panel);
+  color: var(--texto);
+  border-radius: 0;
+}
+
+input::placeholder, textarea::placeholder { color: var(--texto); opacity: 0.55; }
+select option { color: #000; }
+
+input:focus-visible, select:focus-visible, textarea:focus-visible,
+a:focus-visible, button:focus-visible { outline: 2px solid var(--err-fg); outline-offset: 1px; }
+
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] {
+  border-color: var(--err-fg);
+  border-width: 2px;
+}
+
+.mensaje-error { color: var(--err-fg); font-weight: 700; font-size: 0.82rem; min-height: 1.1em; }
+
+.fila-doble { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 32rem) { .fila-doble { grid-template-columns: 1fr; } }
+
+.acciones-formulario { display: flex; gap: 0.8rem; align-items: center; margin-top: 1.4rem; }
+
+button, .boton {
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--linea);
+  padding: 0.55rem 1.1rem;
+  border-radius: 0;
+  text-decoration: none;
+  display: inline-block;
+  background: transparent;
+  color: var(--texto);
+}
+
+.boton--primario { background: var(--texto); color: var(--fondo); }
+.boton--primario:hover { background: var(--err-fg); border-color: var(--err-fg); color: #000; }
+.boton--secundario { background: transparent; color: var(--texto); }
+.boton--secundario:hover { background: var(--panel); }
+
+.aviso-resultado { margin-top: 1.2rem; padding: 0.8rem 1rem; border: 1px solid var(--linea); display: none; }
+.aviso-resultado.mostrar { display: block; }
+.aviso-resultado.error { background: var(--err-bg); color: var(--err-fg); border-color: var(--err-fg); }
+
+/* ---------- Listado / filtros / tabla ---------- */
+.barra-filtros { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; border: 1px solid var(--linea); padding: 1rem 1.2rem; margin-bottom: 1.2rem; }
+.barra-filtros .campo { margin-bottom: 0; min-width: 12rem; }
+
+.tabla-envoltorio { overflow-x: auto; border: 1px solid var(--linea); }
+
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+caption { text-align: left; font-size: 0.82rem; opacity: 0.85; padding: 0.5rem 0.8rem 0; }
+
+thead th { text-align: left; background: var(--texto); color: var(--fondo); padding: 0.55rem 0.7rem; }
+thead th button {
+  background: none; border: none; color: inherit; font-weight: 700;
+  padding: 0; cursor: pointer; font: inherit; text-decoration: underline;
+}
+
+tbody td { padding: 0.55rem 0.7rem; border-top: 1px solid var(--linea); vertical-align: top; }
+
+.etiqueta-tipo { display: inline-block; font-size: 0.76rem; padding: 0.05rem 0.5rem; border: 1px solid var(--linea); }
+
+.paginacion { display: flex; justify-content: center; align-items: center; gap: 0.4rem; margin-top: 1.2rem; flex-wrap: wrap; }
+.paginacion button { min-width: 2.2rem; padding: 0.35rem 0.55rem; }
+.paginacion button[aria-current="page"] { background: var(--texto); color: var(--fondo); }
+.paginacion button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.resumen-resultados { font-size: 0.85rem; opacity: 0.85; margin-bottom: 0.5rem; }
+
+/* ---------- Indicadores / dashboard ---------- */
+.grilla-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; margin-bottom: 1.8rem; }
+.tarjeta-kpi { border: 1px solid var(--linea); padding: 0.9rem 1rem; }
+.tarjeta-kpi .valor-kpi { font-size: 1.9rem; font-weight: 700; display: block; }
+.tarjeta-kpi .etiqueta-kpi { font-size: 0.82rem; opacity: 0.85; }
+
+.grilla-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.2rem; }
+.panel-grafico { border: 1px solid var(--linea); padding: 1rem 1.1rem 0.8rem; }
+.panel-grafico canvas { max-width: 100%; }
+
+/* ---------- Utilidades ---------- */
+.visualmente-oculto {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}

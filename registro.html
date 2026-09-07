@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de voluntario(a) — Avistamientos Chile</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<header class="encabezado">
+  <div class="encabezado__contenido">
+    <a href="index.html" class="marca">
+      <span class="marca__texto">avistamientos.cl
+        <small>Unión de Ornitólogos de Chile</small>
+      </span>
+    </a>
+    <nav class="nav-principal" aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="registro.html" aria-current="page">Registro de voluntarios</a></li>
+        <li><a href="avistamiento.html">Informar avistamiento</a></li>
+        <li><a href="listado.html">Ver avistamientos</a></li>
+        <li><a href="indicadores.html">Indicadores</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Registro de voluntario(a)</h1>
+  <p class="parrafo-intro">Estos datos permiten identificarte y contactarte para coordinar
+  campañas de observación. Los campos marcados como opcionales no son obligatorios para
+  completar tu inscripción.</p>
+
+  <form class="formulario" id="form-registro" novalidate>
+
+    <fieldset>
+      <legend>Identificación</legend>
+
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="nombres">Nombres</label>
+          <input type="text" id="nombres" name="nombres" required autocomplete="given-name">
+          <p class="mensaje-error" id="nombres-error" role="alert"></p>
+        </div>
+        <div class="campo">
+          <label for="apellidos">Apellidos</label>
+          <input type="text" id="apellidos" name="apellidos" required autocomplete="family-name">
+          <p class="mensaje-error" id="apellidos-error" role="alert"></p>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="run">RUN / RUT</label>
+        <input type="text" id="run" name="run" placeholder="12345678-9" required>
+        <p class="ayuda">Con guion y dígito verificador, sin puntos.</p>
+        <p class="mensaje-error" id="run-error" role="alert"></p>
+      </div>
+
+      <div class="campo">
+        <label for="fecha-nacimiento" class="opcional">Fecha de nacimiento</label>
+        <input type="date" id="fecha-nacimiento" name="fecha-nacimiento">
+        <p class="ayuda">Debes tener al menos 12 años para participar como voluntario(a).</p>
+        <p class="mensaje-error" id="fecha-nacimiento-error" role="alert"></p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Datos de contacto</legend>
+
+      <div class="campo">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+        <p class="mensaje-error" id="email-error" role="alert"></p>
+      </div>
+
+      <div class="campo">
+        <label for="celular">Celular</label>
+        <input type="tel" id="celular" name="celular" placeholder="+56 9 1234 5678" required autocomplete="tel">
+        <p class="mensaje-error" id="celular-error" role="alert"></p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Dirección postal</legend>
+
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="region">Región</label>
+          <select id="region" name="region" required>
+            <option value="">Selecciona una región</option>
+          </select>
+          <p class="mensaje-error" id="region-error" role="alert"></p>
+        </div>
+        <div class="campo">
+          <label for="comuna">Comuna</label>
+          <select id="comuna" name="comuna" required disabled>
+            <option value="">Primero selecciona una región</option>
+          </select>
+          <p class="mensaje-error" id="comuna-error" role="alert"></p>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="direccion" class="opcional">Calle y número</label>
+        <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. Siempre Viva 742">
+        <p class="mensaje-error" id="direccion-error" role="alert"></p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Experiencia</legend>
+      <div class="campo">
+        <label for="experiencia" class="opcional">Cuéntanos tu experiencia previa observando aves</label>
+        <textarea id="experiencia" name="experiencia" rows="3" maxlength="400"></textarea>
+        <p class="mensaje-error" id="experiencia-error" role="alert"></p>
+      </div>
+    </fieldset>
+
+    <div class="acciones-formulario">
+      <button type="submit" class="boton--primario">Registrarme</button>
+      <button type="reset" class="boton boton--secundario">Limpiar formulario</button>
+    </div>
+
+    <div class="aviso-resultado" id="aviso-resultado" role="status"></div>
+  </form>
+</main>
+
+<footer class="pie-pagina">
+  Unión de Ornitólogos de Chile — CC5002, Universidad de Chile.
+</footer>
+
+<script src="js/datos-chile.js"></script>
+<script src="js/validaciones.js"></script>
+<script src="js/registro.js"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avistamientos registrados — Avistamientos Chile</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<header class="encabezado">
+  <div class="encabezado__contenido">
+    <a href="index.html" class="marca">
+      <span class="marca__texto">avistamientos.cl
+        <small>Unión de Ornitólogos de Chile</small>
+      </span>
+    </a>
+    <nav class="nav-principal" aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="registro.html">Registro de voluntarios</a></li>
+        <li><a href="avistamiento.html">Informar avistamiento</a></li>
+        <li><a href="listado.html" aria-current="page">Ver avistamientos</a></li>
+        <li><a href="indicadores.html">Indicadores</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Avistamientos registrados</h1>
+  <p class="parrafo-intro">Filtra por tipo de ave y ordena la tabla por el dato que
+  necesites revisar. Los resultados se presentan en páginas de a 8 registros.</p>
+
+  <form class="barra-filtros" id="form-filtros">
+    <div class="campo">
+      <label for="filtro-tipo">Tipo de ave</label>
+      <select id="filtro-tipo">
+        <option value="">Todos los tipos</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="filtro-region">Región</label>
+      <select id="filtro-region">
+        <option value="">Todas las regiones</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="filtro-busqueda">Buscar por nombre de ave o lugar</label>
+      <input type="text" id="filtro-busqueda" placeholder="Ej: garza, Valdivia...">
+    </div>
+
+    <div class="campo">
+      <label for="orden">Ordenar por</label>
+      <select id="orden">
+        <option value="fecha-desc">Fecha (más reciente primero)</option>
+        <option value="fecha-asc">Fecha (más antigua primero)</option>
+        <option value="lugar-asc">Lugar (A-Z)</option>
+        <option value="ave-asc">Nombre de ave (A-Z)</option>
+        <option value="cantidad-desc">Cantidad observada (mayor a menor)</option>
+      </select>
+    </div>
+
+    <button type="button" class="boton boton--secundario" id="boton-limpiar-filtros">Limpiar filtros</button>
+  </form>
+
+  <p class="resumen-resultados" id="resumen-resultados" role="status"></p>
+
+  <div class="tabla-envoltorio">
+    <table>
+      <caption>Listado de avistamientos reportados por la comunidad de voluntarios</caption>
+      <thead>
+        <tr>
+          <th scope="col">Ave</th>
+          <th scope="col">Tipo</th>
+          <th scope="col" id="th-lugar"><button type="button" data-orden="lugar-asc">Lugar</button></th>
+          <th scope="col" id="th-fecha"><button type="button" data-orden="fecha-desc">Fecha y hora</button></th>
+          <th scope="col" id="th-cantidad"><button type="button" data-orden="cantidad-desc">Cantidad</button></th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-tabla">
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="paginacion" id="paginacion" aria-label="Paginación del listado de avistamientos"></nav>
+</main>
+
+<footer class="pie-pagina">
+  Unión de Ornitólogos de Chile — CC5002, Universidad de Chile.
+</footer>
+
+<script src="js/datos-chile.js"></script>
+<script src="js/avistamientos-mock.js"></script>
+<script src="js/listado.js"></script>
+</body>
+</html>

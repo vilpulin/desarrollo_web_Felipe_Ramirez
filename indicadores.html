@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indicadores y métricas — Avistamientos Chile</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<header class="encabezado">
+  <div class="encabezado__contenido">
+    <a href="index.html" class="marca">
+      <span class="marca__texto">avistamientos.cl
+        <small>Unión de Ornitólogos de Chile</small>
+      </span>
+    </a>
+    <nav class="nav-principal" aria-label="Navegación principal">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="registro.html">Registro de voluntarios</a></li>
+        <li><a href="avistamiento.html">Informar avistamiento</a></li>
+        <li><a href="listado.html">Ver avistamientos</a></li>
+        <li><a href="indicadores.html" aria-current="page">Indicadores</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Indicadores y métricas</h1>
+  <p class="parrafo-intro">Una mirada general al estado de la red de observadores y a
+  los avistamientos reportados hasta el momento.</p>
+
+  <section aria-label="Indicadores clave" class="grilla-kpi" id="grilla-kpi"></section>
+
+  <section aria-label="Gráficos" class="grilla-graficos">
+    <div class="panel-grafico">
+      <h3>Avistamientos por tipo de ave</h3>
+      <canvas id="grafico-tipos" role="img" aria-label="Gráfico de barras con la cantidad de avistamientos por tipo de ave"></canvas>
+    </div>
+    <div class="panel-grafico">
+      <h3>Avistamientos por región</h3>
+      <canvas id="grafico-regiones" role="img" aria-label="Gráfico de barras horizontales con avistamientos por región"></canvas>
+    </div>
+    <div class="panel-grafico">
+      <h3>Evolución de avistamientos por semana</h3>
+      <canvas id="grafico-tiempo" role="img" aria-label="Gráfico de línea con la evolución semanal de avistamientos"></canvas>
+    </div>
+    <div class="panel-grafico">
+      <h3>Voluntarios más activos</h3>
+      <canvas id="grafico-voluntarios" role="img" aria-label="Gráfico de barras con la cantidad de reportes por voluntario"></canvas>
+    </div>
+  </section>
+</main>
+
+<footer class="pie-pagina">
+  Unión de Ornitólogos de Chile — CC5002, Universidad de Chile.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="js/avistamientos-mock.js"></script>
+<script src="js/indicadores.js"></script>
+</body>
+</html>
