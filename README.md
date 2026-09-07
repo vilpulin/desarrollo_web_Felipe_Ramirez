@@ -91,9 +91,4 @@ js/indicadores.js      Cálculo de KPIs y gráficos (Chart.js vía CDN)
   el mismo motor que usa el validador oficial (Nu Html Checker / validator.w3.org y
   jigsaw.w3.org), sin errores reportados al momento de la entrega.
 
-## Puntos pendientes de decisión que se comentarán en la entrevista
 
-- Cómo se traduciría la "identificación por correo" del formulario de avistamiento a
-  un inicio de sesión real en una siguiente iteración del sistema.
-- Qué pasaría con archivos adjuntos muy grandes en un backend real (compresión,
-  límites de almacenamiento, procesamiento asíncrono).
