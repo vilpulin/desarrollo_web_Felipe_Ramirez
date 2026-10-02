@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Página no encontrada{% endblock %}
+{% block contenido %}
+  <h1>Página no encontrada</h1>
+  <p>El avistamiento o la página que buscas no existe.</p>
+  <a class="boton boton--secundario" href="{{ url_for('index') }}">‹ Volver al inicio</a>
+{% endblock %}

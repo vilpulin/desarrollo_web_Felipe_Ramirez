@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block titulo %}Avistamientos registrados{% endblock %}
+{% block contenido %}
+  <h1>Avistamientos registrados</h1>
+  <p class="parrafo-intro">Filtra por tipo de ave y ordena la tabla por el dato que
+  necesites revisar. Los resultados se presentan en páginas de a 8 registros. Haz clic
+  en una fila para ver el detalle.</p>
+
+  <form class="barra-filtros" id="form-filtros" method="get" action="{{ url_for('listado') }}">
+    <div class="campo">
+      <label for="filtro-tipo">Tipo de ave</label>
+      <select id="filtro-tipo" name="tipo">
+        <option value="">Todos los tipos</option>
+        {% for t in TIPOS_AVE %}<option value="{{ t }}"{% if f_tipo == t %} selected{% endif %}>{{ t }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="filtro-region">Región</label>
+      <select id="filtro-region" name="region">
+        <option value="">Todas las regiones</option>
+        {% for r in regiones %}<option value="{{ r.id }}"{% if f_region == r.id %} selected{% endif %}>{{ r.nombre|trim }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="campo">
+      <label for="filtro-busqueda">Buscar por nombre de ave o lugar</label>
+      <input type="text" id="filtro-busqueda" name="busqueda" maxlength="80" placeholder="Ej: garza, Valdivia..." value="{{ f_busqueda }}">
+    </div>
+    <div class="campo">
+      <label for="orden">Ordenar por</label>
+      <select id="orden" name="orden">
+        <option value="fecha-desc"{% if f_orden == 'fecha-desc' %} selected{% endif %}>Fecha (más reciente primero)</option>
+        <option value="fecha-asc"{% if f_orden == 'fecha-asc' %} selected{% endif %}>Fecha (más antigua primero)</option>
+        <option value="lugar-asc"{% if f_orden == 'lugar-asc' %} selected{% endif %}>Lugar (A-Z)</option>
+        <option value="ave-asc"{% if f_orden == 'ave-asc' %} selected{% endif %}>Nombre de ave (A-Z)</option>
+        <option value="cantidad-desc"{% if f_orden == 'cantidad-desc' %} selected{% endif %}>Cantidad observada (mayor a menor)</option>
+      </select>
+    </div>
+    <button type="submit" class="boton boton--primario">Aplicar</button>
+    <a class="boton boton--secundario" href="{{ url_for('listado') }}">Limpiar filtros</a>
+  </form>
+
+  <p class="resumen-resultados" role="status">Mostrando {{ filas|length }} de {{ total }} avistamiento(s) — página {{ pagina }} de {{ paginas }}.</p>
+
+  <div class="tabla-envoltorio">
+    <table>
+      <caption>Listado de avistamientos reportados por la comunidad de voluntarios</caption>
+      <thead>
+        <tr>
+          <th scope="col"><a href="{{ url_for('listado', **dict(filtros, orden='ave-asc')) }}">Ave</a></th>
+          <th scope="col">Tipo</th>
+          <th scope="col"><a href="{{ url_for('listado', **dict(filtros, orden='lugar-asc')) }}">Lugar</a></th>
+          <th scope="col"><a href="{{ url_for('listado', **dict(filtros, orden='fecha-desc')) }}">Fecha y hora</a></th>
+          <th scope="col"><a href="{{ url_for('listado', **dict(filtros, orden='cantidad-desc')) }}">Cantidad</a></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for a in filas %}
+        {% set url = url_for('detalle', av_id=a.id, pagina=pagina, **filtros) %}
+        <tr class="fila" data-href="{{ url }}">
+          <td><a href="{{ url }}">{{ a.ave.nombre }}</a></td>
+          <td><span class="etiqueta-tipo">{{ a.tipo_ave }}</span></td>
+          <td>{{ a.lugar }}<br><small>{{ a.comuna.nombre }}, {{ a.comuna.region.nombre|trim }}</small></td>
+          <td>{{ a.fecha_hora|fecha }}</td>
+          <td>{{ a.cantidad }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5">No se encontraron avistamientos con los filtros seleccionados.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="paginacion" aria-label="Paginación del listado de avistamientos">
+    {% if pagina > 1 %}<a href="{{ url_for('listado', pagina=pagina-1, **filtros) }}">‹ Anterior</a>{% else %}<span class="deshabilitado">‹ Anterior</span>{% endif %}
+    {% for n in range(1, paginas + 1) %}
+      <a href="{{ url_for('listado', pagina=n, **filtros) }}"{% if n == pagina %} aria-current="page"{% endif %}>{{ n }}</a>
+    {% endfor %}
+    {% if pagina < paginas %}<a href="{{ url_for('listado', pagina=pagina+1, **filtros) }}">Siguiente ›</a>{% else %}<span class="deshabilitado">Siguiente ›</span>{% endif %}
+  </nav>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll("tr.fila").forEach(function (fila) {
+  fila.addEventListener("click", function () { window.location.href = fila.dataset.href; });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block titulo %}Avistamientos Chile{% endblock %} — Avistamientos Chile</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+
+<div class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<header class="encabezado">
+  <div class="encabezado__contenido">
+    <a href="{{ url_for('index') }}" class="marca">
+      <span class="marca__texto">avistamientos.cl
+        <small>Unión de Ornitólogos de Chile</small>
+      </span>
+    </a>
+    <nav class="nav-principal" aria-label="Navegación principal">
+      <ul>
+        <li><a href="{{ url_for('index') }}"{% if request.endpoint == 'index' %} aria-current="page"{% endif %}>Inicio</a></li>
+        <li><a href="{{ url_for('registro') }}"{% if request.endpoint in ('registro', 'guardar_voluntario') %} aria-current="page"{% endif %}>Registrar voluntario</a></li>
+        <li><a href="{{ url_for('nuevo_avistamiento') }}"{% if request.endpoint in ('nuevo_avistamiento', 'guardar_avistamiento') %} aria-current="page"{% endif %}>Informar avistamiento</a></li>
+        <li><a href="{{ url_for('listado') }}"{% if request.endpoint in ('listado', 'detalle') %} aria-current="page"{% endif %}>Ver avistamientos</a></li>
+        <li><a href="{{ url_for('indicadores') }}"{% if request.endpoint == 'indicadores' %} aria-current="page"{% endif %}>Estadísticas</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+  {% for categoria, mensaje in mensajes %}
+  <div class="aviso-resultado mostrar{% if categoria == 'error' %} error{% endif %}" role="status">{{ mensaje }}</div>
+  {% endfor %}
+{% endwith %}
+{% block contenido %}{% endblock %}
+</main>
+
+<footer class="pie-pagina">
+  Unión de Ornitólogos de Chile — CC5002, Universidad de Chile.
+</footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block titulo %}Informar avistamiento{% endblock %}
+{% block contenido %}
+  <h1>Informar un avistamiento</h1>
+  <p class="parrafo-intro">Este formulario está disponible solo para voluntarios(as) ya
+  registrados. Completa los datos del ave observada y adjunta un respaldo visual: es
+  obligatorio incluir al menos una foto o video.</p>
+
+  <form class="formulario" id="form-avistamiento" method="post" action="{{ url_for('guardar_avistamiento') }}" enctype="multipart/form-data" novalidate>
+
+    <fieldset>
+      <legend>Identificación del voluntario(a)</legend>
+      <div class="campo">
+        <label for="email-voluntario">Correo con el que te registraste</label>
+        <input type="email" id="email-voluntario" name="email-voluntario" required maxlength="80" value="{{ datos['email-voluntario'] }}">
+        <p class="mensaje-error" id="email-voluntario-error" role="alert">{{ errores['email-voluntario'] }}</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Datos del ave observada</legend>
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="tipo-ave">Tipo de ave</label>
+          <select id="tipo-ave" name="tipo-ave" required>
+            <option value="">Selecciona un tipo</option>
+            {% for t in TIPOS_AVE %}
+            <option value="{{ t }}"{% if datos['tipo-ave'] == t %} selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+          <p class="mensaje-error" id="tipo-ave-error" role="alert">{{ errores['tipo-ave'] }}</p>
+        </div>
+        <div class="campo">
+          <label for="nombre-ave">Nombre del ave</label>
+          <input type="text" id="nombre-ave" name="nombre-ave" list="lista-aves" placeholder="Ej: Chercán" required maxlength="60" autocomplete="off" value="{{ datos['nombre-ave'] }}">
+          <datalist id="lista-aves">
+            {% for nombre in aves %}<option value="{{ nombre }}">{% endfor %}
+          </datalist>
+          <p class="ayuda">Escribe el nombre común y elige una de las sugerencias del listado.</p>
+          <p class="mensaje-error" id="nombre-ave-error" role="alert">{{ errores['nombre-ave'] }}</p>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="cantidad">Cantidad de ejemplares observados</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" max="5000" step="1" required value="{{ datos.cantidad }}">
+        <p class="mensaje-error" id="cantidad-error" role="alert">{{ errores.cantidad }}</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lugar, fecha y hora</legend>
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="region-avistamiento">Región</label>
+          <select id="region-avistamiento" name="region-avistamiento" required>
+            <option value="">Selecciona una región</option>
+            {% for r in regiones %}
+            <option value="{{ r.id }}"{% if datos['region-avistamiento']|string == r.id|string %} selected{% endif %}>{{ r.nombre|trim }}</option>
+            {% endfor %}
+          </select>
+          <p class="mensaje-error" id="region-avistamiento-error" role="alert">{{ errores['region-avistamiento'] }}</p>
+        </div>
+        <div class="campo">
+          <label for="comuna-avistamiento">Comuna</label>
+          <select id="comuna-avistamiento" name="comuna-avistamiento" required disabled data-seleccionada="{{ datos['comuna-avistamiento'] }}">
+            <option value="">Primero selecciona una región</option>
+          </select>
+          <p class="mensaje-error" id="comuna-avistamiento-error" role="alert">{{ errores['comuna-avistamiento'] }}</p>
+        </div>
+      </div>
+      <div class="campo">
+        <label for="lugar-especifico">Lugar específico</label>
+        <input type="text" id="lugar-especifico" name="lugar-especifico" placeholder="Ej: Humedal Río Maipo, orilla norte" required maxlength="120" value="{{ datos['lugar-especifico'] }}">
+        <p class="mensaje-error" id="lugar-especifico-error" role="alert">{{ errores['lugar-especifico'] }}</p>
+      </div>
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="latitud" class="opcional">Latitud</label>
+          <input type="text" id="latitud" name="latitud" placeholder="Ej: -33.45" maxlength="12" value="{{ datos.latitud }}">
+          <p class="mensaje-error" id="latitud-error" role="alert">{{ errores.latitud }}</p>
+        </div>
+        <div class="campo">
+          <label for="longitud" class="opcional">Longitud</label>
+          <input type="text" id="longitud" name="longitud" placeholder="Ej: -70.66" maxlength="12" value="{{ datos.longitud }}">
+          <p class="mensaje-error" id="longitud-error" role="alert">{{ errores.longitud }}</p>
+        </div>
+      </div>
+      <div class="fila-doble">
+        <div class="campo">
+          <label for="fecha">Fecha del avistamiento</label>
+          <input type="date" id="fecha" name="fecha" required value="{{ datos.fecha }}">
+          <p class="ayuda">No puede ser una fecha futura ni de hace más de 5 años.</p>
+          <p class="mensaje-error" id="fecha-error" role="alert">{{ errores.fecha }}</p>
+        </div>
+        <div class="campo">
+          <label for="hora">Hora aproximada</label>
+          <input type="time" id="hora" name="hora" required value="{{ datos.hora }}">
+          <p class="mensaje-error" id="hora-error" role="alert">{{ errores.hora }}</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Respaldo y descripción</legend>
+      <div class="campo">
+        <label for="archivo">Fotos o videos del avistamiento</label>
+        <input type="file" id="archivo" name="archivo" accept="image/*,video/*" multiple required>
+        <p class="ayuda">Entre 1 y 5 archivos. Formatos admitidos: jpg, png, webp, gif, mp4, mov, webm (máx. 50&nbsp;MB cada uno).</p>
+        <p class="mensaje-error" id="archivo-error" role="alert">{{ errores.archivo }}</p>
+      </div>
+      <div class="campo">
+        <label for="descripcion" class="opcional">Descripción adicional</label>
+        <textarea id="descripcion" name="descripcion" rows="3" maxlength="500" placeholder="Comportamiento observado, condiciones climáticas, etc.">{{ datos.descripcion }}</textarea>
+        <p class="mensaje-error" id="descripcion-error" role="alert">{{ errores.descripcion }}</p>
+      </div>
+    </fieldset>
+
+    <div class="acciones-formulario">
+      <button type="submit" class="boton--primario">Enviar avistamiento</button>
+      <a class="boton boton--secundario" href="{{ url_for('nuevo_avistamiento') }}">Limpiar formulario</a>
+    </div>
+    <div class="aviso-resultado{% if errores %} mostrar error{% endif %}" id="aviso-resultado" role="status">{% if errores %}Revisa los campos marcados en rojo antes de continuar.{% endif %}</div>
+  </form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/comun.js') }}"></script>
+<script src="{{ url_for('static', filename='js/avistamiento.js') }}"></script>
+{% endblock %}

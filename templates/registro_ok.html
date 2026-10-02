@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Registro exitoso{% endblock %}
+{% block contenido %}
+  <h1>¡Gracias, {{ nombre }}!</h1>
+  <div class="aviso-resultado mostrar" role="status">Tu registro como voluntario(a) fue guardado correctamente.</div>
+  <p>¿Quieres informar un avistamiento ahora? Tus datos de identificación ya quedaron precargados.</p>
+  <div class="confirmacion-acciones">
+    <a class="boton boton--primario" href="{{ url_for('nuevo_avistamiento') }}">Sí, informar un avistamiento</a>
+    <a class="boton boton--secundario" href="{{ url_for('index') }}">No, ir a la página de inicio</a>
+  </div>
+{% endblock %}

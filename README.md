@@ -1,94 +1,56 @@
-# CC5002 — Tarea 1: Sistema de Avistamientos de Aves de Chile
+# CC5002 — Tarea 2: Avistamientos de Aves de Chile (Flask + SQLAlchemy + MySQL)
 
-Prototipo de interfaz (HTML5 + CSS3 + JavaScript) para el sistema de
-avistamientos de aves de la Unión de Ornitólogos de Chile.
+Continuación de la Tarea 1: se conserva el diseño, los formularios, las validaciones en JavaScript
+(`static/js/validaciones.js`) y el listado con filtros/orden/paginación; ahora los datos viajan a Flask
+y se guardan en MySQL.
 
-## Estructura de archivos
-
+## Puesta en marcha
+```bash
+pip install -r requirements.txt
+mysql -u root -p < sql/tarea2.sql                  # esquema (modificado, ver abajo) y usuario cc5002
+mysql -u root -p tarea2 < sql/region-comuna.sql
+mysql -u root -p tarea2 < sql/aves.sql
+python app.py                                      # http://127.0.0.1:5000
 ```
-index.html             Portada y navegación general
-registro.html          Registro de voluntario(a)
-avistamiento.html      Formulario para informar un avistamiento
-listado.html           Listado de avistamientos: filtro, orden y paginación
-indicadores.html       Indicadores y gráficos
-css/estilos.css        Hoja de estilos única, compartida por todas las páginas
-js/validaciones.js     Funciones de validación reutilizables (RUT, email, celular,
-                       fechas, archivo adjunto, coordenadas, textos)
-js/datos-chile.js      Constantes: regiones/comunas de Chile, tipos de ave, aves
-                       sugeridas para el <datalist>
-js/avistamientos-mock.js  Datos de ejemplo (34 registros) usados por el listado y
-                       los indicadores, ya que el prototipo no tiene backend
-js/registro.js         Lógica específica del formulario de registro
-js/avistamiento.js     Lógica específica del formulario de avistamiento
-js/listado.js          Filtro, orden y paginación en el navegador
-js/indicadores.js      Cálculo de KPIs y gráficos (Chart.js vía CDN)
-```
+Credenciales: localhost:3306, base `tarea2`, usuario `cc5002`, clave `programacionweb`
+(sobrescribibles con `DATABASE_URL`; la clave de sesión con `SECRET_KEY`).
 
-## Decisiones de diseño e implementación
+## Rutas
+| Ruta | Función |
+|---|---|
+| `/` | Portada: bienvenida, menú y resumen de los 2 últimos avistamientos |
+| `/registro` (GET/POST) | Formulario de voluntario; POST valida en servidor e inserta en `voluntario` |
+| `/avistamiento` (GET/POST) | Formulario de avistamiento; POST valida e inserta en `avistamiento` + `registro` |
+| `/avistamientos` | Listado paginado (8 por página) con filtros por tipo/región/texto y orden |
+| `/avistamientos/<id>` | Detalle con fotos y videos leídos desde la BD |
+| `/indicadores` | Marcador de posición (las estadísticas son de la siguiente tarea) |
 
-- **Sin backend ni almacenamiento**, tal como pide el enunciado: los formularios
-  validan en el navegador y, al enviarse correctamente, solo muestran un mensaje de
-  confirmación (`aviso-resultado`). El listado y los indicadores usan datos de ejemplo
-  constantes (`AVISTAMIENTOS_MOCK`) en vez de datos reales, para poder mostrar cómo
-  se vería la interfaz con información cargada.
+## Ajustes al modelo de datos (permitidos por el enunciado)
+La Tarea 1 pedía más datos que el modelo base, por lo que `sql/tarea2.sql` agrega:
+- `voluntario`: `run` (único), `fecha_nacimiento`, `direccion`, `experiencia`; `email` también es único.
+  `nombre` guarda «nombres apellidos» y `telefono` se normaliza a `+569XXXXXXXX`.
+- `avistamiento`: `tipo_ave`, `cantidad`, `comuna_id` (FK a `comuna`), `latitud`, `longitud`.
+  `fecha_hora` combina la fecha y la hora del formulario.
 
-- **HTML semántico**: se usan `<header>`, `<nav>`, `<main>`, `<footer>`, `<fieldset>`/
-  `<legend>` para agrupar campos relacionados de un formulario, y `<table>` con
-  `<caption>`/`<th scope="col">` para el listado, evitando `<div>` salvo cuando no
-  existe una etiqueta semántica más adecuada (por ejemplo, como contenedor de layout
-  puro en la grilla de tarjetas).
-
-- **Obligatorio vs. opcional**: todo campo obligatorio usa `required` **y además** se
-  valida explícitamente en JavaScript (el enunciado indica que `required` por sí solo
-  no cuenta como validación). Los campos opcionales llevan la palabra "(opcional)" en
-  su etiqueta mediante la clase `.opcional`, y si se completan igual se valida su
-  formato (por ejemplo, la dirección o la descripción).
-
-- **Reglas de validación implementadas en `validaciones.js`**:
-  - RUT/RUN chileno: formato `12345678-9` y verificación real del dígito verificador
-    (módulo 11), no solo una expresión regular.
-  - Correo electrónico: formato general `usuario@dominio.tld`.
-  - Celular: acepta `+56 9 XXXXXXXX` y variantes con espacios/guiones.
-  - Fecha de nacimiento: no puede ser futura y exige una edad mínima (12 años) para
-    registrarse como voluntario(a).
-  - Fecha de avistamiento: no puede ser futura **ni** anterior a 5 años (regla propia,
-    pensada para mantener la base de datos enfocada en cambios recientes de
-    población, que es justamente la preocupación de la Unión de Ornitólogos).
-  - Archivo adjunto: en `avistamiento.html` es obligatorio adjuntar una foto o video;
-    se valida que exista un archivo, que su extensión sea una de las admitidas
-    (imagen o video) y que no supere 50 MB.
-  - Coordenadas (opcionales): si se ingresan, deben ser numéricas y quedar dentro de
-    rangos geográficos razonables para el territorio continental de Chile.
-
-- **Región y comuna en cascada**: `js/datos-chile.js` contiene todas las regiones de
-  Chile con sus comunas. El `<select>` de comuna se deshabilita y se repuebla cada vez
-  que cambia la región, tanto en el registro de voluntario como en el formulario de
-  avistamiento.
-
-- **Listado (`listado.html` / `listado.js`)**: permite filtrar por tipo de ave, por
-  región y por texto libre (nombre de ave, lugar o comuna); permite ordenar por fecha
-  (ascendente/descendente), lugar, nombre de ave o cantidad de ejemplares, tanto desde
-  el `<select>` "Ordenar por" como haciendo clic en los encabezados de columna; y pagina
-  los resultados de a 8 filas, con botones "Anterior/Siguiente" y números de página.
-
-- **Indicadores (`indicadores.html` / `indicadores.js`)**: se muestran 5 KPIs (voluntarios
-  registrados, avistamientos, especies distintas, voluntarios con al menos un reporte,
-  ejemplares observados) y 4 gráficos (por tipo de ave, por región, evolución semanal y
-  voluntarios más activos), construidos con la librería [Chart.js](https://www.chartjs.org/)
-  cargada desde CDN.
-
-- **Diseño visual**: la identidad se inspira en un cuaderno de campo de ornitólogo
-  (fondo tipo papel con líneas suaves, verde bosque como color de marca, acento cálido
-  tipo sello de cuaderno) para que el sistema se sienta propio del contexto de
-  observación de aves y no una plantilla genérica. Tipografía `Fraunces` (serif, para
-  títulos) + `Work Sans` (sans-serif, para texto), cargadas desde Google Fonts.
-
-- **Accesibilidad básica**: foco visible (`:focus-visible`), asociación de errores a su
-  campo mediante `aria-invalid` y `role="alert"`, `<caption>` y `scope="col"` en la
-  tabla, y textos alternativos (`aria-label`) en los gráficos.
-
-- **Validación W3C**: se verificó localmente el HTML5 y CSS3 de todas las páginas con
-  el mismo motor que usa el validador oficial (Nu Html Checker / validator.w3.org y
-  jigsaw.w3.org), sin errores reportados al momento de la entrega.
-
-
+## Decisiones
+- **Identificación por correo** (como en la Tarea 1): el avistamiento se asocia al voluntario cuyo correo
+  se ingresa; si no existe, se muestra error. Tras registrarse, el correo queda precargado (cookie de sesión
+  firmada, no por URL, para no exponer datos).
+- **Nombre del ave**: se sigue usando `<datalist>`, ahora alimentado desde la tabla `ave`; el servidor exige que
+  el nombre exista en ella (la FK `ave_id` es obligatoria). Cambio respecto de la Tarea 1, donde era texto libre.
+- **Doble validación**: las mismas reglas de `validaciones.js` están en `validators.py` (RUN con módulo 11, correo,
+  celular, edad mínima 12, fecha de avistamiento no futura ni > 5 años, coordenadas dentro de Chile, etc.).
+  Si el servidor detecta errores, vuelve a mostrar el formulario con los datos ingresados y los mensajes (HTTP 400).
+  También verifica que la comuna pertenezca a la región y que RUN/correo no estén repetidos.
+- **Entradas maliciosas**: Jinja con autoescape (XSS); consultas parametrizadas de SQLAlchemy (SQL injection);
+  búsqueda con `autoescape` de `%`/`_`; parámetros de URL tipados y saneados (`pagina`, `orden`, `tipo`, `region`);
+  los ids de `<select>` se comprueban contra la BD.
+- **Archivos**: hasta 5 por avistamiento (foto: jpg/png/webp/gif, video: mp4/mov/webm), 50 MB c/u. Se valida
+  extensión y firma binaria real, se renombran como `uuid_nombre-saneado` y se guardan en `static/uploads/`.
+  En `registro`: `ruta_archivo` = `uploads`, `nombre_archivo` = nombre guardado; una fila por archivo.
+- **Transacción**: avistamiento y registros se insertan juntos; si algo falla, rollback y se borran los
+  archivos ya escritos.
+- **Listado**: filtros, búsqueda, orden y paginación ahora se hacen en SQL (parámetros GET), y los enlaces de
+  página/encabezado conservan los filtros. Al abrir un detalle, «Volver al listado» regresa a la misma página y filtros.
+- `fecha_registro` = `datetime.now()` al insertar el voluntario.
+- Sin implementar (fuera de alcance): protección CSRF y autenticación real (pendiente ya anunciado en la Tarea 1).
