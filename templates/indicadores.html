@@ -2,6 +2,33 @@
 {% block titulo %}Estadísticas{% endblock %}
 {% block contenido %}
   <h1>Indicadores y métricas</h1>
-  <p class="parrafo-intro">Esta sección estará disponible próximamente, en la siguiente etapa del proyecto.</p>
-  <a class="boton boton--secundario" href="{{ url_for('index') }}">‹ Volver al inicio</a>
+  <p class="parrafo-intro">Una mirada general al estado de la red de observadores y a
+  los avistamientos reportados hasta el momento.</p>
+
+  <section class="grilla-graficos" aria-label="Gráficos" id="grafico-contenedor"
+           data-url-dia="{{ url_for('api_avistamientos_por_dia') }}"
+           data-url-tipo="{{ url_for('api_avistamientos_por_tipo') }}"
+           data-url-comuna="{{ url_for('api_voluntarios_por_comuna') }}">
+    <div class="panel-grafico panel-ancho">
+      <h2>Avistamientos por día</h2>
+      <p class="estado-grafico" id="estado-dia" role="status">Cargando…</p>
+      <div class="caja-grafico"><canvas id="grafico-dia" role="img" aria-label="Gráfico de líneas con la cantidad de avistamientos registrados por día"></canvas></div>
+    </div>
+    <div class="panel-grafico">
+      <h2>Avistamientos por tipo de ave</h2>
+      <p class="estado-grafico" id="estado-tipo" role="status">Cargando…</p>
+      <div class="caja-grafico"><canvas id="grafico-tipo" role="img" aria-label="Gráfico de torta con el total de avistamientos por tipo de ave"></canvas></div>
+    </div>
+    <div class="panel-grafico">
+      <h2>Voluntarios por comuna</h2>
+      <p class="estado-grafico" id="estado-comuna" role="status">Cargando…</p>
+      <div class="caja-grafico"><canvas id="grafico-comuna" role="img" aria-label="Gráfico de barras con el total de voluntarios registrados por comuna"></canvas></div>
+    </div>
+  </section>
+
+  <p><a class="boton boton--secundario" href="{{ url_for('index') }}">‹ Volver a la portada</a></p>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/vendor/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='js/estadisticas.js') }}"></script>
 {% endblock %}

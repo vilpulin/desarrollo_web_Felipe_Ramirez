@@ -218,9 +218,6 @@ tbody td { padding: 0.55rem 0.7rem; border-top: 1px solid var(--linea); vertical
 .tarjeta-kpi .valor-kpi { font-size: 1.9rem; font-weight: 700; display: block; }
 .tarjeta-kpi .etiqueta-kpi { font-size: 0.82rem; opacity: 0.85; }
 
-.grilla-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.2rem; }
-.panel-grafico { border: 1px solid var(--linea); padding: 1rem 1.1rem 0.8rem; }
-.panel-grafico canvas { max-width: 100%; }
 
 /* ---------- Utilidades ---------- */
 .visualmente-oculto {
@@ -247,3 +244,15 @@ tr.fila:hover { background: var(--panel); }
 .resumen-portada h3 { margin: 0 0 0.4rem; }
 .resumen-portada p { margin: 0.1rem 0; font-size: 0.9rem; }
 .confirmacion-acciones { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1rem; }
+
+/* ---------- Tarea 3: estadísticas y comentarios ---------- */
+.grilla-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.2rem; margin-bottom: 1.4rem; }
+.panel-grafico { border: 1px solid var(--linea); padding: 1rem 1.1rem 0.8rem; min-width: 0; }
+.panel-grafico h2 { margin-top: 0; font-size: 1.05rem; }
+.panel-ancho { grid-column: 1 / -1; }
+.caja-grafico { position: relative; height: 18rem; }
+.estado-grafico { margin: 0; font-size: 0.85rem; opacity: 0.85; }
+.seccion-comentarios { margin: 2rem 0; }
+.comentario { border: 1px solid var(--linea); padding: 0.7rem 1rem; margin-bottom: 0.8rem; }
+.comentario__cabecera { margin: 0 0 0.3rem; font-size: 0.85rem; }
+.comentario__texto { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
