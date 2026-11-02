@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from flask import (Flask, render_template, request, redirect, url_for, flash,
                    jsonify, abort, session)
@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from models import (Session, Region, Comuna, Voluntario, Ave, Avistamiento,
-                    Registro)
+                    Registro, Comentario)
 import validators as v
 
 app = Flask(__name__)
@@ -59,6 +59,47 @@ def index():
 @app.route("/indicadores")
 def indicadores():
     return render_template("indicadores.html")
+
+
+# ------------------------------------------------- API de estadísticas (JSON)
+@app.route("/api/estadisticas/avistamientos-por-dia")
+def api_avistamientos_por_dia():
+    """Cantidad de avistamientos por día (fecha del avistamiento). Incluye los
+    días intermedios sin avistamientos con valor 0 para no distorsionar la línea."""
+    dia = func.date(Avistamiento.fecha_hora)
+    filas = Session().execute(
+        select(dia, func.count(Avistamiento.id)).group_by(dia).order_by(dia)).all()
+    conteo = {str(d)[:10]: n for d, n in filas}
+    if not conteo:
+        return jsonify({"labels": [], "valores": []})
+    inicio = date.fromisoformat(min(conteo))
+    fin = date.fromisoformat(max(conteo))
+    labels, valores = [], []
+    d = inicio
+    while d <= fin:
+        k = d.isoformat()
+        labels.append(k)
+        valores.append(conteo.get(k, 0))
+        d += timedelta(days=1)
+    return jsonify({"labels": labels, "valores": valores})
+
+
+@app.route("/api/estadisticas/avistamientos-por-tipo")
+def api_avistamientos_por_tipo():
+    filas = Session().execute(
+        select(Avistamiento.tipo_ave, func.count(Avistamiento.id))
+        .group_by(Avistamiento.tipo_ave).order_by(func.count(Avistamiento.id).desc())).all()
+    return jsonify({"labels": [t for t, _ in filas], "valores": [n for _, n in filas]})
+
+
+@app.route("/api/estadisticas/voluntarios-por-comuna")
+def api_voluntarios_por_comuna():
+    filas = Session().execute(
+        select(Comuna.nombre, func.count(Voluntario.id))
+        .join(Voluntario, Voluntario.comuna_id == Comuna.id)
+        .group_by(Comuna.id, Comuna.nombre)
+        .order_by(func.count(Voluntario.id).desc(), Comuna.nombre)).all()
+    return jsonify({"labels": [c.strip() for c, _ in filas], "valores": [n for _, n in filas]})
 
 
 # ------------------------------------------------------------- Voluntario
@@ -231,6 +272,44 @@ def detalle(av_id):
     volver = {k: request.args[k] for k in ("tipo", "region", "busqueda", "orden", "pagina")
               if request.args.get(k)}
     return render_template("detalle.html", av=av, volver=volver)
+
+
+# ------------------------------------------------- Comentarios (asíncronos, JSON)
+@app.route("/api/avistamientos/<int:av_id>/comentarios", methods=["GET"])
+def api_listar_comentarios(av_id):
+    s = Session()
+    if s.get(Avistamiento, av_id) is None:
+        return jsonify({"error": "Avistamiento no encontrado."}), 404
+    filas = s.scalars(select(Comentario).where(Comentario.avistamiento_id == av_id)
+                      .order_by(Comentario.fecha.desc(), Comentario.id.desc())).all()
+    return jsonify([_comentario_json(c) for c in filas])
+
+
+@app.route("/api/avistamientos/<int:av_id>/comentarios", methods=["POST"])
+def api_agregar_comentario(av_id):
+    s = Session()
+    if s.get(Avistamiento, av_id) is None:
+        return jsonify({"error": "Avistamiento no encontrado."}), 404
+    datos = request.get_json(silent=True)
+    if not isinstance(datos, dict):
+        datos = request.form
+    errores, limpio = v.validar_comentario(datos)
+    if errores:
+        return jsonify({"errores": errores}), 400
+    c = Comentario(nombre=limpio["nombre"], texto=limpio["texto"],
+                   fecha=datetime.now(), avistamiento_id=av_id)
+    try:
+        s.add(c)
+        s.commit()
+    except Exception:
+        s.rollback()
+        return jsonify({"error": "No se pudo guardar el comentario. Intenta nuevamente."}), 500
+    return jsonify(_comentario_json(c)), 201
+
+
+def _comentario_json(c):
+    return {"id": c.id, "nombre": c.nombre, "texto": c.texto,
+            "fecha": c.fecha.strftime("%d-%m-%Y · %H:%M")}
 
 
 @app.errorhandler(404)

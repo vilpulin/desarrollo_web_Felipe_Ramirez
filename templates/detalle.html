@@ -30,5 +30,39 @@
     {% endfor %}
   </div>
 
+  <section aria-labelledby="titulo-comentarios" class="seccion-comentarios">
+    <h2 id="titulo-comentarios">Comentarios</h2>
+
+    <form class="formulario" id="form-comentario" method="post" novalidate
+          action="{{ url_for('api_agregar_comentario', av_id=av.id) }}">
+      <h3>Agregar un comentario</h3>
+      <div class="campo">
+        <label for="comentario-nombre">Nombre</label>
+        <input type="text" id="comentario-nombre" name="nombre" required minlength="3" maxlength="50" autocomplete="name">
+        <p class="mensaje-error" id="comentario-nombre-error" role="alert"></p>
+      </div>
+      <div class="campo">
+        <label for="comentario-texto">Comentario</label>
+        <textarea id="comentario-texto" name="texto" rows="3" cols="40" required minlength="5" maxlength="300"></textarea>
+        <p class="ayuda">Entre 5 y 300 caracteres.</p>
+        <p class="mensaje-error" id="comentario-texto-error" role="alert"></p>
+      </div>
+      <div class="acciones-formulario">
+        <button type="submit" class="boton--primario">Agregar comentario</button>
+      </div>
+      <div class="aviso-resultado" id="aviso-comentario" role="status"></div>
+    </form>
+
+    <h3>Comentarios de la comunidad</h3>
+    <div id="lista-comentarios" aria-live="polite"
+         data-url="{{ url_for('api_listar_comentarios', av_id=av.id) }}">
+      <p id="estado-comentarios">Cargando comentarios…</p>
+    </div>
+  </section>
+
   <a class="boton boton--secundario" href="{{ url_for('listado', **volver) }}">‹ Volver al listado</a>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/validaciones.js') }}"></script>
+<script src="{{ url_for('static', filename='js/comentarios.js') }}"></script>
 {% endblock %}

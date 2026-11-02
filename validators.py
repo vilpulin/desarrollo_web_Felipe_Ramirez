@@ -260,3 +260,19 @@ def nombre_unico(original):
 
 def es_video(nombre):
     return extension(nombre) in VID_EXT
+
+
+def validar_comentario(datos):
+    """datos: dict con 'nombre' y 'texto' (JSON o formulario). Retorna (errores, limpios)."""
+    nombre = datos.get("nombre", "")
+    texto = datos.get("texto", "")
+    nombre = nombre.strip() if isinstance(nombre, str) else ""
+    texto = texto.strip() if isinstance(texto, str) else ""
+    e = {}
+    if len(nombre) < 3 or len(nombre) > 50:
+        e["nombre"] = "El nombre debe tener entre 3 y 50 caracteres."
+    if len(texto) < 5:
+        e["texto"] = "El comentario debe tener al menos 5 caracteres."
+    elif len(texto) > 300:  # límite de la columna comentario.texto
+        e["texto"] = "El comentario no puede superar los 300 caracteres."
+    return e, {"nombre": nombre, "texto": texto}

@@ -1,4 +1,4 @@
-# CC5002 — Tarea 2: Avistamientos de Aves de Chile (Flask + SQLAlchemy + MySQL)
+# CC5002 — Tarea 3: Avistamientos de Aves de Chile (Flask + SQLAlchemy + MySQL)
 
 Continuación de la Tarea 1: se conserva el diseño, los formularios, las validaciones en JavaScript
 (`static/js/validaciones.js`) y el listado con filtros/orden/paginación; ahora los datos viajan a Flask
@@ -10,6 +10,7 @@ pip install -r requirements.txt
 mysql -u root -p < sql/tarea2.sql                  # esquema (modificado, ver abajo) y usuario cc5002
 mysql -u root -p tarea2 < sql/region-comuna.sql
 mysql -u root -p tarea2 < sql/aves.sql
+mysql -u root -p tarea2 < sql/tabla-comentario.sql   # NUEVO en Tarea 3: tabla comentario
 python app.py                                      # http://127.0.0.1:5000
 ```
 Credenciales: localhost:3306, base `tarea2`, usuario `cc5002`, clave `programacionweb`
@@ -23,7 +24,11 @@ Credenciales: localhost:3306, base `tarea2`, usuario `cc5002`, clave `programaci
 | `/avistamiento` (GET/POST) | Formulario de avistamiento; POST valida e inserta en `avistamiento` + `registro` |
 | `/avistamientos` | Listado paginado (8 por página) con filtros por tipo/región/texto y orden |
 | `/avistamientos/<id>` | Detalle con fotos y videos leídos desde la BD |
-| `/indicadores` | Marcador de posición (las estadísticas son de la siguiente tarea) |
+| `/indicadores` | **Estadísticas**: 3 gráficos generados en el navegador + enlace «Volver a la portada» |
+| `/api/estadisticas/avistamientos-por-dia` | JSON para el gráfico de líneas |
+| `/api/estadisticas/avistamientos-por-tipo` | JSON para el gráfico de torta |
+| `/api/estadisticas/voluntarios-por-comuna` | JSON para el gráfico de barras |
+| `/api/avistamientos/<id>/comentarios` (GET/POST) | Lista / agrega comentarios (JSON, usados con `fetch`) |
 
 ## Ajustes al modelo de datos (permitidos por el enunciado)
 La Tarea 1 pedía más datos que el modelo base, por lo que `sql/tarea2.sql` agrega:
@@ -54,3 +59,31 @@ La Tarea 1 pedía más datos que el modelo base, por lo que `sql/tarea2.sql` agr
   página/encabezado conservan los filtros. Al abrir un detalle, «Volver al listado» regresa a la misma página y filtros.
 - `fecha_registro` = `datetime.now()` al insertar el voluntario.
 - Sin implementar (fuera de alcance): protección CSRF y autenticación real (pendiente ya anunciado en la Tarea 1).
+
+---
+## Tarea 3
+
+### Estadísticas (`/indicadores`)
+- Los datos salen de la BD con consultas agregadas (`GROUP BY`) en tres URLs JSON de Flask; el navegador las pide con
+  `fetch` y dibuja los gráficos (`static/js/estadisticas.js`).
+- **Biblioteca de gráficos: [Chart.js](https://www.chartjs.org/) 4.4.4** (licencia MIT, ya usada en la Tarea 1). Se incluye
+  una copia local en `static/js/vendor/` (con su licencia), así que no depende de un CDN.
+- **Líneas — avistamientos por día:** se cuenta por la *fecha del avistamiento* (`fecha_hora`), pues la tabla no guarda
+  la fecha en que se ingresó el registro. Los días sin avistamientos entre el primero y el último se muestran con 0
+  para no distorsionar la línea.
+- **Torta — por tipo de ave:** `avistamiento.tipo_ave`.
+- **Barras — voluntarios por comuna:** solo aparecen comunas con al menos un voluntario registrado.
+- Si no hay datos, cada gráfico muestra «Aún no hay datos para mostrar»; si falla la petición, un mensaje de error.
+
+### Comentarios (detalle del avistamiento)
+- Tabla `comentario` creada con `sql/tabla-comentario.sql` (sin modificarla); modelo `Comentario` en `models.py`.
+- **Formulario:** nombre (3–50 caracteres) y texto (textarea `rows=3 cols=40`, mínimo 5 caracteres), botón «Agregar comentario».
+  Se valida en el navegador (`comentarios.js`, reutilizando `validaciones.js`) y de nuevo en el servidor (`validar_comentario`).
+- **Asíncrono:** el envío (`POST` JSON) y el listado (`GET` JSON) usan `fetch`; la página no se recarga. Si el servidor
+  rechaza los datos (HTTP 400), el formulario sigue visible con los mensajes de error bajo cada campo; si todo sale bien se
+  limpia el formulario y se refresca la lista (más reciente primero, con fecha, nombre y texto).
+- **Límite superior del texto = 300**, porque así está definida la columna `comentario.texto` (VARCHAR(300)); el enunciado solo fija el mínimo.
+- **Seguridad:** el contenido se inserta en el DOM con `textContent` (no `innerHTML`) y la BD usa consultas parametrizadas,
+  de modo que `<script>…` se muestra como texto. El servidor revisa los tipos recibidos (un JSON con listas u objetos se rechaza).
+- `fecha` se guarda con `datetime.now()` del servidor al insertar.
+- Sin implementar (fuera de alcance): protección CSRF, límite de frecuencia (anti-spam) y autenticación de comentaristas.
